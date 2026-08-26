@@ -1,4 +1,4 @@
-archivos <- list.files(pattern = "\.[rR]$")
+archivos <- list.files(pattern = "\\.[rR]$")
 arch_al <- archivos[archivos != "validador_r.R"]
 if (length(arch_al) > 0) {
   entorno <- new.env()
@@ -14,6 +14,6 @@ if (length(arch_al) > 0) {
   cuenta <- gsub("[- ]", "", trimws(as.character(get_val("NUMERO_CUENTA"))))
   if (nchar(cuenta) != 9 || !grepl("^[0-9]+$", cuenta)) stop("numero_cuenta debe tener 9 digitos.")
   if (nchar(trimws(as.character(get_val("NOMBRE")))) < 5) stop("nombre demasiado corto.")
-  if (!grepl("@", as.character(get_val("CORREO"))) || !grepl("\.", as.character(get_val("CORREO")))) stop("correo invalido.")
+  if (!grepl("@", as.character(get_val("CORREO"))) || !grepl("\\.", as.character(get_val("CORREO")))) stop("correo invalido.")
   if (as.numeric(get_val("SEMESTRE")) <= 0) stop("semestre invalido.")
 }
