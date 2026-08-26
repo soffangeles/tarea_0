@@ -1,15 +1,26 @@
-import glob, importlib.util
+import glob, importlib.util, sys
 
-archivos = [f for f in glob.glob("*.py") if f != "validador_python.py"]
-if archivos:
-    spec = importlib.util.spec_from_file_location("mod", archivos[0])
+def validar():
+    archivos = [f for f in glob.glob("*.py") if f != "validador_python.py"]
+    if not archivos:
+        return
+    spec = importlib.util.spec_from_file_location("entrega", archivos[0])
     m = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(m)
-    for v in ["NOMBRE", "NUMERO_CUENTA", "CORREO", "CARRERA", "SEMESTRE"]:
-        assert hasattr(m, v), f"Falta definir la variable {v}"
+    attrs = {k.upper(): getattr(m, k) for k in dir(m) if not k.startswith("__")}
     
-    cuenta = str(modulo.NUMERO_CUENTA if hasattr(modulo, "NUMERO_CUENTA") else m.NUMERO_CUENTA).strip().replace("-", "")
-    assert len(cuenta) == 9 and cuenta.isdigit(), "El número de cuenta debe tener exactamente 9 dígitos numéricos."
-    assert len(str(m.NOMBRE).strip()) >= 5, "Nombre demasiado corto."
-    assert "@" in str(m.CORREO) and "." in str(m.CORREO), "Formato de correo inválido."
-    assert isinstance(m.SEMESTRE, int) and m.SEMESTRE > 0, "Semestre inválido."
+    for req in ["NOMBRE", "NUMERO_CUENTA", "CORREO", "CARRERA", "SEMESTRE"]:
+        assert req in attrs, f"Falta definir la variable {req}"
+    
+    cuenta = str(attrs["NUMERO_CUENTA"]).strip().replace("-", "").replace(" ", "")
+    assert len(cuenta) == 9 and cuenta.isdigit(), f"NUMERO_CUENTA ({cuenta}) debe tener 9 digitos."
+    assert len(str(attrs["NOMBRE"]).strip()) >= 5, "NOMBRE demasiado corto."
+    assert "@" in str(attrs["CORREO"]) and "." in str(attrs["CORREO"]), "CORREO invalido."
+    assert int(attrs["SEMESTRE"]) > 0, "SEMESTRE invalido."
+
+if __name__ == "__main__":
+    try:
+        validar()
+    except Exception as e:
+        print(f"Error: {e}")
+        sys.exit(1)
