@@ -1,15 +1,19 @@
-archs <- list.files(pattern = "\.[rR]$")
-arch_al <- archs[archs != "validador_r.R"]
+archivos <- list.files(pattern = "\.[rR]$")
+arch_al <- archivos[archivos != "validador_r.R"]
 if (length(arch_al) > 0) {
-  source(arch_al[1])
-  if (!exists("nombre") || !exists("numero_cuenta") || !exists("correo") || !exists("carrera") || !exists("semestre")) {
-    stop("Faltan variables por definir.")
+  entorno <- new.env()
+  sys.source(arch_al[1], envir = entorno)
+  vars <- ls(entorno)
+  vars_upper <- toupper(vars)
+  
+  for (req in c("NOMBRE", "NUMERO_CUENTA", "CORREO", "CARRERA", "SEMESTRE")) {
+    if (!req %in% vars_upper) stop(paste("Falta definir la variable", tolower(req)))
   }
-  cuenta <- gsub("-", "", trimws(as.character(numero_cuenta)))
-  if (nchar(cuenta) != 9 || !grepl("^[0-9]+$", cuenta)) {
-    stop("El número de cuenta debe tener exactamente 9 dígitos numéricos.")
-  }
-  if (nchar(trimws(nombre)) < 5) stop("Nombre demasiado corto.")
-  if (!grepl("@", correo) || !grepl("\.", correo)) stop("Correo inválido.")
-  if (!is.numeric(semestre) || semestre <= 0) stop("Semestre inválido.")
+  
+  get_val <- function(v) get(vars[which(vars_upper == v)[1]], envir = entorno)
+  cuenta <- gsub("[- ]", "", trimws(as.character(get_val("NUMERO_CUENTA"))))
+  if (nchar(cuenta) != 9 || !grepl("^[0-9]+$", cuenta)) stop("numero_cuenta debe tener 9 digitos.")
+  if (nchar(trimws(as.character(get_val("NOMBRE")))) < 5) stop("nombre demasiado corto.")
+  if (!grepl("@", as.character(get_val("CORREO"))) || !grepl("\.", as.character(get_val("CORREO")))) stop("correo invalido.")
+  if (as.numeric(get_val("SEMESTRE")) <= 0) stop("semestre invalido.")
 }
