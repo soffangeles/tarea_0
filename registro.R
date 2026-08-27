@@ -1,0 +1,5 @@
+nombre <- "Sofia Angeles Rojo"
+numero_cuenta <- "321151483"
+correo <-"sofia.angeles@ciencias.unam.mx"
+carrera <- "Actuaria"
+semestre <- "7"
